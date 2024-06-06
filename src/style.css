@@ -1,0 +1,108 @@
+:root {
+  --background: #010309;
+  --border: #5873c6;
+  --font-color: rgba(255, 255, 255, 0.87);
+
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.7);
+  background-color: var(--background);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --container-size: 70vw;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+}
+
+#app {
+  height: 100vh;
+}
+
+.settings {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px;
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+
+  input {
+    width: 100%;
+  }
+}
+
+.canvas-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.setting-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  label {
+    flex-shrink: 0;
+    display: block;
+    margin-right: 12px;
+  }
+
+  input:not([type="color"]) {
+    margin: 0;
+    padding: 8px 16px;
+    outline: none;
+    border: 1px solid var(--border);
+    background-color: transparent;
+    color: var(--font-color);
+  }
+
+  input[type="color"] {
+    width: 64px;
+    height: 36px;
+    background-color: transparent;
+  }
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    opacity: 1;
+  }
+
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    -webkit-appearance: inner-spin-button !important;
+    width: 24px;
+    height: 100%;
+  }
+}
