@@ -15,14 +15,12 @@ try {
 
   const defaults: CylinderOptions = {
     dotsCount: 100,
-    dotSize: 0.001,
-    dotGeometry: 0.005,
-    dotsRadius: 0.8,
+    dotSize: 0.05,
     dotColor: 0xffffff,
     dotMovementSpeed: 25,
-    dotSpread: 3,
+    ySinFactor: 3,
     thetaMultiplier: 20,
-    cylinderRadius: 2,
+    cylinderRadius: 2.5,
     cylinderHeight: 2,
   };
 

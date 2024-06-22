@@ -9,18 +9,28 @@ export default (defaults: CylinderOptions, drawFn: (options: CylinderOptions) =>
     .step(10)
     .onFinishChange((dotsCount) => drawFn({ ...defaults, dotsCount }))
 
+  gui.add(defaults, 'dotSize', 0.01, 0.1)
+    .name('Dot size')
+    .step(0.01)
+    .onFinishChange((dotSize) => drawFn({ ...defaults, dotSize }))
+
   gui.add(defaults, 'dotMovementSpeed', 0.1, 100)
     .name('Dot movement speed')
     .step(0.1)
     .onFinishChange((dotMovementSpeed) => drawFn({ ...defaults, dotMovementSpeed }))
 
-  // gui.add(defaults, 'dotSpread', 1, 10)
-  //   .name('Dot spread multiplier')
-  //   .step(0.1)
-  //   .onFinishChange((dotSpread) => drawFn({ ...defaults, dotSpread }))
+  gui.add(defaults, 'ySinFactor', 1, 10)
+    .name('Sinus function factor')
+    .step(0.1)
+    .onFinishChange((ySinFactor) => drawFn({ ...defaults, ySinFactor }))
 
   gui.add(defaults, 'cylinderHeight', 0.1, 10)
     .name('Cylinder height')
     .step(0.1)
     .onFinishChange((cylinderHeight) => drawFn({ ...defaults, cylinderHeight }))
+
+  gui.add(defaults, 'cylinderRadius', 0.1, 10)
+    .name('Cylinder radius')
+    .step(0.1)
+    .onFinishChange((cylinderRadius) => drawFn({ ...defaults, cylinderRadius }))
 };

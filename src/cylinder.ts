@@ -4,13 +4,11 @@ import { OrbitControls } from "three/addons/controls/orbitcontrols";
 
 export type CylinderOptions = {
   dotsCount: number;
-  dotsRadius: number;
   dotSize: number;
-  dotGeometry: number;
   dotColor: number;
   dotMovementSpeed: number;
   thetaMultiplier: number;
-  dotSpread: number;
+  ySinFactor: number;
   cylinderRadius: number;
   cylinderHeight: number;
 };
@@ -46,14 +44,14 @@ function createSpheres(scene: Three.Scene, cylinder: Three.Mesh<Three.CylinderGe
   for (let i: number = 0; i < options.dotsCount; i++) {
     const theta: number = Math.PI * options.thetaMultiplier * (i / (options.dotsCount - 1));
     const y: number = Math.sin(theta * 0.1);
-    const geometry: Three.SphereGeometry = new Three.SphereGeometry(0.05, 32, 16);
+    const geometry: Three.SphereGeometry = new Three.SphereGeometry(options.dotSize, 32, 16);
     const material: Three.MeshLambertMaterial = new Three.MeshLambertMaterial({ color: 0xffffff, opacity: 0.3, alphaTest: 0.1 });
     const sphere: Three.Mesh<Three.SphereGeometry> = new Three.Mesh(geometry, material);
     scene.add(sphere);
     sphere.position.set(
-      options.dotsRadius * Math.cos(theta) * options.cylinderRadius,
+      Math.cos(theta) * options.cylinderRadius,
       y,
-      options.dotsRadius * Math.sin(theta) * options.cylinderRadius,
+      Math.sin(theta) * options.cylinderRadius,
     );
     cylinder.add(sphere);
     spheres.push(sphere);
@@ -94,6 +92,7 @@ function draw(
   scene: Three.Scene;
 } {
   const scene: Three.Scene = new Three.Scene();
+  scene.clear();
   scene.background = new Three.Color("#010309");
 
   const renderer: Three.WebGLRenderer = new Three.WebGLRenderer();
@@ -110,7 +109,11 @@ function draw(
 }
 
 export default ($container: HTMLDivElement) => {
+  let currentOptions: CylinderOptions | null = null;
+
   function run(options: CylinderOptions) {
+    currentOptions = options;
+    $container.innerHTML = '';
     const { renderer, scene, spheres, camera } = draw(options, $container);
     const spheresCount: number = spheres.length;
 
@@ -121,7 +124,7 @@ export default ($container: HTMLDivElement) => {
         const theta: number = Math.PI * 2 * (i / (spheresCount - 1));
         spheres[i].position.y =
           Math.sin(
-            theta * options.dotSpread +
+            theta * options.ySinFactor +
             (Date.now() / 10000) * options.dotMovementSpeed,
           ) * options.cylinderHeight;
       }
@@ -131,6 +134,12 @@ export default ($container: HTMLDivElement) => {
 
     animate();
   }
+
+  window.addEventListener('resize', () => {
+    if (currentOptions) {
+      run(currentOptions);
+    }
+  })
 
   return { run };
 };
