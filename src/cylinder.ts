@@ -1,5 +1,6 @@
-import * as Three from 'three';
-import { OrbitControls } from 'three/addons/controls/orbitcontrols';
+import * as Three from "three";
+// @ts-ignore
+import { OrbitControls } from "three/addons/controls/orbitcontrols";
 
 export type CylinderOptions = {
   dotsCount: number;
@@ -7,75 +8,122 @@ export type CylinderOptions = {
   dotSize: number;
   dotGeometry: number;
   dotColor: number;
+  dotMovementSpeed: number;
   thetaMultiplier: number;
-  sinMultiplier: number;
+  dotSpread: number;
+  cylinderRadius: number;
+  cylinderHeight: number;
+};
+
+function createLight(scene: Three.Scene): void {
+  const light: Three.DirectionalLight = new Three.DirectionalLight(0xffffff, 1.2);
+  light.position.set(2, 5, 10);
+  scene.add(light)
 }
 
-function draw({
-                dotsCount,
-                dotsRadius,
-                dotSize,
-                dotGeometry,
-                dotColor,
-                thetaMultiplier,
-              }: CylinderOptions, $container: HTMLDivElement): {
-  renderer: Three.Renderer,
-  dots: Three.Points[],
-  camera: Three.Camera,
-  scene: Three.Scene
-} {
-  const scene: Three.Scene = new Three.Scene();
-  scene.background = new Three.Color('#010309');
-
-  const camera: Three.PerspectiveCamera = new Three.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+function createCamera(renderer: Three.Renderer): Three.PerspectiveCamera {
+  const camera: Three.PerspectiveCamera = new Three.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000,
+  );
   camera.position.z = 6;
-
-  const renderer: Three.WebGLRenderer = new Three.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-
-  const controls: OrbitControls = new OrbitControls(camera, renderer.domElement);
+  const controls: OrbitControls = new OrbitControls(
+    camera,
+    renderer.domElement,
+  );
   controls.listenToKeyEvents(window);
   controls.minDistance = 0;
   controls.maxDistance = 15;
 
+  return camera;
+}
 
-  const cylinderGeometry: Three.CylinderGeometry = new Three.CylinderGeometry(1, 1, 2, 32);
-  const cylinderMaterial: Three.MeshBasicMaterial = new Three.MeshBasicMaterial({ visible: false });
+function createSpheres(scene: Three.Scene, cylinder: Three.Mesh<Three.CylinderGeometry>, options: CylinderOptions): Three.Mesh[] {
+  const spheres: Three.Mesh[] = [];
+
+  for (let i: number = 0; i < options.dotsCount; i++) {
+    const theta: number = Math.PI * options.thetaMultiplier * (i / (options.dotsCount - 1));
+    const y: number = Math.sin(theta * 0.1);
+    const geometry: Three.SphereGeometry = new Three.SphereGeometry(0.05, 32, 16);
+    const material: Three.MeshLambertMaterial = new Three.MeshLambertMaterial({ color: 0xffffff, opacity: 0.3, alphaTest: 0.1 });
+    const sphere: Three.Mesh<Three.SphereGeometry> = new Three.Mesh(geometry, material);
+    scene.add(sphere);
+    sphere.position.set(
+      options.dotsRadius * Math.cos(theta) * options.cylinderRadius,
+      y,
+      options.dotsRadius * Math.sin(theta) * options.cylinderRadius,
+    );
+    cylinder.add(sphere);
+    spheres.push(sphere);
+  }
+
+  return spheres;
+}
+
+function createCylinder(scene: Three.Scene): Three.Mesh<Three.CylinderGeometry> {
+  const cylinderGeometry: Three.CylinderGeometry = new Three.CylinderGeometry(
+    1,
+    1,
+    2,
+    32,
+  );
+  const cylinderMaterial: Three.MeshBasicMaterial = new Three.MeshBasicMaterial(
+    { visible: false },
+  );
+  // @ts-ignore
   cylinderGeometry.material = cylinderMaterial;
-  const cylinder: Three.Mesh<Three.CylinderGeometry> = new Three.Mesh(cylinderGeometry, cylinderMaterial);
+  const cylinder: Three.Mesh<Three.CylinderGeometry> = new Three.Mesh(
+    cylinderGeometry,
+    cylinderMaterial,
+  );
+
   scene.add(cylinder);
 
-  const dots: Three.Points[] = [];
-  const material: Three.PointsMaterial = new Three.PointsMaterial({ size: dotSize, color: dotColor });
+  return cylinder;
+}
 
-  for (let i: number = 0; i < dotsCount; i++) {
-    const theta: number = Math.PI * thetaMultiplier * (i / (dotsCount - 1));
-    const y: number = Math.sin(theta * 0.1);
+function draw(
+  options: CylinderOptions,
+  $container: HTMLDivElement,
+): {
+  renderer: Three.Renderer;
+  spheres: Three.Mesh[];
+  camera: Three.Camera;
+  scene: Three.Scene;
+} {
+  const scene: Three.Scene = new Three.Scene();
+  scene.background = new Three.Color("#010309");
 
-    const geometry: Three.SphereGeometry = new Three.SphereGeometry(dotGeometry);
-    const dot: Three.Points = new Three.Points(geometry, material);
-    dot.position.set(dotsRadius * Math.cos(theta), y, dotsRadius * Math.sin(theta));
-    cylinder.add(dot);
-    dots.push(dot);
-  }
+  const renderer: Three.WebGLRenderer = new Three.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  createLight(scene);
+  const cylinder: Three.Mesh<Three.CylinderGeometry> = createCylinder(scene);
+  const camera: Three.PerspectiveCamera = createCamera(renderer);
+  const spheres: Three.Mesh[] = createSpheres(scene, cylinder, options);
 
   $container.appendChild(renderer.domElement);
 
-  return { dots, renderer, camera, scene };
+  return { renderer, scene, spheres, camera };
 }
 
 export default ($container: HTMLDivElement) => {
   function run(options: CylinderOptions) {
-    const { dots, renderer, scene, camera } = draw(options, $container);
-    const dotsCount: number = dots.length;
+    const { renderer, scene, spheres, camera } = draw(options, $container);
+    const spheresCount: number = spheres.length;
 
     function animate() {
       requestAnimationFrame(animate);
 
-      for (let i: number = 0; i < dotsCount; i++) {
-        const dot: Three.Points = dots[i];
-        const theta: number = Math.PI * 2 * (i / (dotsCount - 1));
-        dot.position.y = Math.sin(theta * options.sinMultiplier + Date.now() / 1000);
+      for (let i: number = 0; i < spheresCount; i++) {
+        const theta: number = Math.PI * 2 * (i / (spheresCount - 1));
+        spheres[i].position.y =
+          Math.sin(
+            theta * options.dotSpread +
+            (Date.now() / 10000) * options.dotMovementSpeed,
+          ) * options.cylinderHeight;
       }
 
       renderer.render(scene, camera);
@@ -85,4 +133,4 @@ export default ($container: HTMLDivElement) => {
   }
 
   return { run };
-}
+};
