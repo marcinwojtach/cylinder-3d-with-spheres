@@ -76,7 +76,7 @@ body, html {
     margin-right: 12px;
   }
 
-  input:not([type="color"]) {
+  input:not([type='color']) {
     margin: 0;
     padding: 8px 16px;
     outline: none;
@@ -85,7 +85,7 @@ body, html {
     color: var(--font-color);
   }
 
-  input[type="color"] {
+  input[type='color'] {
     width: 64px;
     height: 36px;
     background-color: transparent;

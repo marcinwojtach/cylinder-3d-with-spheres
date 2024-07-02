@@ -1,6 +1,6 @@
-import * as Three from "three";
+import * as Three from 'three';
 // @ts-ignore
-import { OrbitControls } from "three/addons/controls/orbitcontrols";
+import { OrbitControls } from 'three/addons/controls/orbitcontrols';
 
 export type CylinderOptions = {
   dotsCount: number;
@@ -42,18 +42,23 @@ function createSpheres(scene: Three.Scene, cylinder: Three.Mesh<Three.CylinderGe
   const spheres: Three.Mesh[] = [];
 
   for (let i: number = 0; i < options.dotsCount; i++) {
-    const theta: number = Math.PI * options.thetaMultiplier * (i / (options.dotsCount - 1));
-    const y: number = Math.sin(theta * 0.1);
     const geometry: Three.SphereGeometry = new Three.SphereGeometry(options.dotSize, 32, 16);
     const material: Three.MeshLambertMaterial = new Three.MeshLambertMaterial({ color: 0xffffff, opacity: 0.3, alphaTest: 0.1 });
     const sphere: Three.Mesh<Three.SphereGeometry> = new Three.Mesh(geometry, material);
+
     scene.add(sphere);
+
+    const theta: number = Math.PI * options.thetaMultiplier * (i / (options.dotsCount - 1));
+    const y: number = Math.sin(theta * 0.1);
+
     sphere.position.set(
       Math.cos(theta) * options.cylinderRadius,
       y,
       Math.sin(theta) * options.cylinderRadius,
     );
+
     cylinder.add(sphere);
+
     spheres.push(sphere);
   }
 
@@ -93,7 +98,7 @@ function draw(
 } {
   const scene: Three.Scene = new Three.Scene();
   scene.clear();
-  scene.background = new Three.Color("#010309");
+  scene.background = new Three.Color('#010309');
 
   const renderer: Three.WebGLRenderer = new Three.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);

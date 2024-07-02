@@ -20,7 +20,7 @@ export default (defaults: CylinderOptions, drawFn: (options: CylinderOptions) =>
     .onFinishChange((dotMovementSpeed) => drawFn({ ...defaults, dotMovementSpeed }))
 
   gui.add(defaults, 'ySinFactor', 1, 10)
-    .name('Sinus function factor')
+    .name('Vertical dot movement factor')
     .step(0.1)
     .onFinishChange((ySinFactor) => drawFn({ ...defaults, ySinFactor }))
 
